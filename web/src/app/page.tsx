@@ -1,9 +1,19 @@
-"use client";
+import HeroSection from "@/components/LandingPage/HeroSection";
+import Navbar from "@/components/LandingPage/Navbar";
+import TestimonialsSection from "@/components/LandingPage/TestimonialSection";
+import FeaturesSection from "@/components/LandingPage/FeaturesSection";
+import HowItWorks from "@/components/LandingPage/HowItWorks";
+import Footer from "@/components/LandingPage/Footer";
 
 export default function Home() {
   return (
-    <div className="text-3xl flex justify-center items-center h-[100vh]">
-      Testimonial App!
-    </div>
+    <main>
+      <Navbar />
+      <HeroSection />
+      <TestimonialsSection />
+      <FeaturesSection />
+      <HowItWorks />
+      <Footer />
+    </main>
   );
 }
