@@ -10,7 +10,6 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 const queryClient = new QueryClient();
 
-//Get localStorage value during SSR
 const getInitialEnhancedConfig = () => {
   if (typeof window !== "undefined") {
     return localStorage.getItem("useEnhancedConfig") === "true";
@@ -25,7 +24,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   // Effect to handle initialization
   useEffect(() => {
-    // Double-check localStorage on mount (useful for SSR)
     const savedPreference =
       localStorage.getItem("useEnhancedConfig") === "true";
     if (savedPreference !== useEnhancedConfig) {
@@ -39,7 +37,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("useEnhancedConfig", newConfigState.toString());
   };
 
-  // Always render with the current config
+  // rendering with the current config
   const currentConfig = useEnhancedConfig ? enhancedConfig : publicConfig;
 
   return (

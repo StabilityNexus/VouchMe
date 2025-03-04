@@ -16,27 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "VouchMe",
   description:
-    "VouchMe enables trust in decentralized ecosystems by allowing users to vouch for each other and provide testimonials, building a transparent and verifiable reputation system.",
+    "VouchMe is a blockchain-based testimonial system that enables users to provide testimonials securely and transparently, building a transparent and verifiable reputation system.",
   keywords:
     "VouchMe, decentralized trust, reputation system, testimonials, blockchain, vouching, secure, Web3, Stability Nexus",
   robots: "index, follow",
 };
-
-// openGraph: {
-//   type: "website",
-//   url: "WEBSITE URL",
-//   title: "VouchMe",
-//   description:
-//     "VouchMe helps users establish trust in Web3 communities through a transparent and verifiable reputation system powered by blockchain, with testimonial support.",
-//   images: [
-//     {
-//       url: "IMAGE URL",
-//       width: 1200,
-//       height: 630,
-//       alt: "VouchMe Logo",
-//     },
-//   ],
-// },
 
 export default function RootLayout({
   children,
