@@ -64,6 +64,8 @@ export interface VouchMeInterface extends Interface {
       | "getReceivedTestimonials"
       | "getTestimonialCount"
       | "getTestimonialDetails"
+      | "getTotalProfiles"
+      | "getTotalTestimonials"
       | "hasExistingTestimonial"
       | "isApprovedForAll"
       | "name"
@@ -75,6 +77,8 @@ export interface VouchMeInterface extends Interface {
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
+      | "totalProfiles"
+      | "totalTestimonials"
       | "transferFrom"
       | "userProfiles"
   ): FunctionFragment;
@@ -126,6 +130,14 @@ export interface VouchMeInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getTotalProfiles",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalTestimonials",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "hasExistingTestimonial",
     values: [AddressLike, AddressLike]
   ): string;
@@ -164,6 +176,14 @@ export interface VouchMeInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "totalProfiles",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalTestimonials",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferFrom",
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
@@ -199,6 +219,14 @@ export interface VouchMeInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getTotalProfiles",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalTestimonials",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "hasExistingTestimonial",
     data: BytesLike
   ): Result;
@@ -227,6 +255,14 @@ export interface VouchMeInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalProfiles",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalTestimonials",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -490,6 +526,10 @@ export interface VouchMe extends BaseContract {
     "view"
   >;
 
+  getTotalProfiles: TypedContractMethod<[], [bigint], "view">;
+
+  getTotalTestimonials: TypedContractMethod<[], [bigint], "view">;
+
   hasExistingTestimonial: TypedContractMethod<
     [sender: AddressLike, receiver: AddressLike],
     [[boolean, bigint] & { exists: boolean; tokenId: bigint }],
@@ -544,6 +584,10 @@ export interface VouchMe extends BaseContract {
   symbol: TypedContractMethod<[], [string], "view">;
 
   tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+
+  totalProfiles: TypedContractMethod<[], [bigint], "view">;
+
+  totalTestimonials: TypedContractMethod<[], [bigint], "view">;
 
   transferFrom: TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
@@ -603,6 +647,12 @@ export interface VouchMe extends BaseContract {
     [VouchMe.TestimonialStructOutput],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "getTotalProfiles"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getTotalTestimonials"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "hasExistingTestimonial"
   ): TypedContractMethod<
@@ -665,6 +715,12 @@ export interface VouchMe extends BaseContract {
   getFunction(
     nameOrSignature: "tokenURI"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "totalProfiles"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalTestimonials"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "transferFrom"
   ): TypedContractMethod<
