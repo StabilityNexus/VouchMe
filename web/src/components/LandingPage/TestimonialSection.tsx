@@ -3,11 +3,13 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CountUp } from "@/components/ui/count-up";
+import { useContractStats } from "@/hooks/useContractStats";
 import { useRouter } from "next/navigation";
 import { Shield, Users, FileText, CheckCircle, Verified } from "lucide-react";
 
 const TestimonialsSection = () => {
   const router = useRouter();
+  const { profiles, testimonials } = useContractStats();
 
   return (
     <section
@@ -49,7 +51,7 @@ const TestimonialsSection = () => {
                   <Users className="w-6 h-6 text-indigo-400" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                  <CountUp value={5420} delay={500} />+
+                  <CountUp value={profiles} delay={500} />+
                 </div>
                 <div className="text-sm text-gray-400 font-medium">
                   Total Users
@@ -61,7 +63,7 @@ const TestimonialsSection = () => {
                   <FileText className="w-6 h-6 text-indigo-400" />
                 </div>
                 <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                  <CountUp value={12800} delay={500} />+
+                  <CountUp value={testimonials} delay={500} />+
                 </div>
                 <div className="text-sm text-gray-400 font-medium">
                   Total Testimonials
