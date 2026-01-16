@@ -7,8 +7,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-
-contract VouchMe is ERC721URIStorage , ReentrancyGuard {
+contract VouchMe is ERC721URIStorage, ReentrancyGuard {
     using ECDSA for bytes32;
     using Strings for uint256;
     
@@ -277,7 +276,7 @@ contract VouchMe is ERC721URIStorage , ReentrancyGuard {
      * @param receiver The receiver of the testimonial
      */
     function _removeTestimonialFromList(uint256 tokenId, address sender, address receiver) internal {
-        //Delete testimonial data 
+        // Delete testimonial data to fix memory leak
         delete _testimonials[tokenId];
         
         // Delete from testimonial mapping
@@ -313,8 +312,6 @@ contract VouchMe is ERC721URIStorage , ReentrancyGuard {
         address sender = _testimonials[tokenId].sender;
         require(_testimonial[sender][msg.sender] == tokenId, "Testimonial already deleted");
         
-        _burn(tokenId);
-
         _removeTestimonialFromList(tokenId, sender, msg.sender);
         
         emit TestimonialDeleted(tokenId, msg.sender);
