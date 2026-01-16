@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract VouchMe is ERC721URIStorage {
+contract VouchMe is ERC721URIStorage, ReentrancyGuard {
     using ECDSA for bytes32;
     using Strings for uint256;
     
@@ -68,7 +69,7 @@ contract VouchMe is ERC721URIStorage {
         string calldata giverName,
         string calldata profileUrl,
         bytes calldata signature
-    ) external returns (uint256) {
+    ) external nonReentrant returns (uint256) {
         // Hash the message that was signed
         bytes32 messageHash = keccak256(
             abi.encodePacked(
@@ -275,6 +276,9 @@ contract VouchMe is ERC721URIStorage {
      * @param receiver The receiver of the testimonial
      */
     function _removeTestimonialFromList(uint256 tokenId, address sender, address receiver) internal {
+        // Delete testimonial data to fix memory leak
+        delete _testimonials[tokenId];
+        
         // Delete from testimonial mapping
         delete _testimonial[sender][receiver];
         
@@ -301,7 +305,7 @@ contract VouchMe is ERC721URIStorage {
      * @dev Deletes a testimonial
      * @param tokenId The token ID to delete
      */
-    function deleteTestimonial(uint256 tokenId) external {
+    function deleteTestimonial(uint256 tokenId) external nonReentrant {
         require(_ownerOf(tokenId) == msg.sender, "Only recipient can delete");
         
         // Check if the testimonial still exists
