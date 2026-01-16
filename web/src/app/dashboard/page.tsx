@@ -82,6 +82,12 @@ export default function Dashboard() {
     isRefreshing,
   } = useWaku();
 
+  // Message constants for sharing
+  const TESTIMONIAL_REQUEST_MESSAGE =
+    "Hi! I'd love to get your feedback. You can share your testimonial here:";
+  const SHOWCASE_MESSAGE =
+    "Check out my testimonials and recommendations here:";
+
   // State declarations - activeView must be declared before useEffect that uses it
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [newTestimonial, setNewTestimonial] = useState("");
@@ -1276,7 +1282,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnX(
                                         shareableLink,
-                                        "Hi! I'd love to get your feedback. You can share your testimonial here:"
+                                        TESTIMONIAL_REQUEST_MESSAGE
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1310,7 +1316,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnWhatsApp(
                                         shareableLink,
-                                        "Hi! I'd love to get your feedback. You can share your testimonial here:"
+                                        TESTIMONIAL_REQUEST_MESSAGE
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1327,7 +1333,7 @@ export default function Dashboard() {
                                       shareViaEmail(
                                         shareableLink,
                                         "Request for Testimonial",
-                                        "Hi! I'd love to get your feedback. You can share your testimonial here:"
+                                        TESTIMONIAL_REQUEST_MESSAGE
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1396,7 +1402,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnX(
                                         `${baseUrl}/testimonials?address=${address}`,
-                                        "Check out my testimonials and recommendations here:"
+                                        SHOWCASE_MESSAGE
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1432,7 +1438,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnWhatsApp(
                                         `${baseUrl}/testimonials?address=${address}`,
-                                        "Check out my testimonials and recommendations here:"
+                                        SHOWCASE_MESSAGE
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1449,7 +1455,7 @@ export default function Dashboard() {
                                       shareViaEmail(
                                         `${baseUrl}/testimonials?address=${address}`,
                                         "My Testimonials and Recommendations",
-                                        "Check out my testimonials and recommendations here:"
+                                        SHOWCASE_MESSAGE
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}

@@ -11,6 +11,8 @@ contract VouchMe is ERC721URIStorage {
     using Strings for uint256;
     
     uint256 private _tokenIdTracker; // Manually track token IDs
+    uint256 public totalProfiles; // Counter for total profiles created
+    uint256 public totalTestimonials; // Counter for total testimonials created
 
     // Maps user address to their received testimonial token IDs
     mapping(address => uint256[]) private _receivedTestimonials;
@@ -86,7 +88,9 @@ contract VouchMe is ERC721URIStorage {
 
         // Check if there's an existing testimonial from this sender to this receiver
         uint256 existingTokenId = _testimonial[senderAddress][msg.sender];
+        bool isUpdate = false;
         if (existingTokenId != 0) {
+            isUpdate = true;
             // Remove the existing testimonial
             _removeTestimonialFromList(existingTokenId, senderAddress, msg.sender);
         }
@@ -114,6 +118,11 @@ contract VouchMe is ERC721URIStorage {
         
         // Update testimonial mapping
         _testimonial[senderAddress][msg.sender] = newTokenId;
+        
+        // Increment testimonials counter only for new testimonials (not updates)
+        if (!isUpdate) {
+            totalTestimonials++;
+        }
         
         // Generate token URI
         string memory tokenURI = generateTokenURI(newTokenId);
@@ -161,6 +170,22 @@ contract VouchMe is ERC721URIStorage {
      */
     function getTestimonialCount(address receiver) external view returns (uint256) {
         return _receivedTestimonials[receiver].length;
+    }
+    
+    /**
+     * @dev Gets the total number of profiles created on the platform
+     * @return The total count of profiles
+     */
+    function getTotalProfiles() external view returns (uint256) {
+        return totalProfiles;
+    }
+    
+    /**
+     * @dev Gets the total number of testimonials created on the platform
+     * @return The total count of testimonials
+     */
+    function getTotalTestimonials() external view returns (uint256) {
+        return totalTestimonials;
     }
     
     /**
@@ -213,11 +238,19 @@ contract VouchMe is ERC721URIStorage {
         string calldata contact,
         string calldata bio
     ) external {
+        // Check if this is a new profile (first time setting)
+        bool isNewProfile = bytes(userProfiles[msg.sender].name).length == 0;
+        
         userProfiles[msg.sender] = Profile({
             name: name,
             contact: contact,
             bio: bio
         });
+        
+        // Increment profiles counter only for new profiles
+        if (isNewProfile) {
+            totalProfiles++;
+        }
         
         emit ProfileUpdated(msg.sender);
     }

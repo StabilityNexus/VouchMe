@@ -21,7 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ethers": "^6.13.5",
-    "framer-motion": "^12.4.7",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.475.0",
     "motion": "^12.4.7",
     "next": "15.1.7",

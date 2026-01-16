@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,11 +17,23 @@ const Navbar = ({
   useEnhancedConfig: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { address } = useAccount();
   const pathname = usePathname();
 
   const isAuthenticated = !!address;
   const isLandingPage = pathname === "/";
+
+  useEffect(() => {
+    if (isLandingPage) {
+      const handleScroll = () => {
+        setIsScrolled(window.scrollY > 50);
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [isLandingPage]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -32,7 +44,17 @@ const Navbar = ({
   };
 
   return (
-    <nav className="bg-[#171717]">
+    <nav
+      className={
+        isLandingPage
+          ? `fixed top-0 w-full z-50 transition-all duration-300 ${
+              isScrolled
+                ? "bg-black/80 backdrop-blur-md border-b border-gray-800/50"
+                : "bg-transparent"
+            }`
+          : "bg-[#171717]"
+      }
+    >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex items-center space-x-3">
