@@ -9,6 +9,9 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import VouchMeLogo from "../image/VouchMeLogo.png";
 
+const NAVY_BG = "#0B1C2D";
+const SHEET_HEIGHT = "50vh"; // half page
+
 const Navbar = ({
   toggleWalletConfig,
   useEnhancedConfig,
@@ -16,167 +19,133 @@ const Navbar = ({
   toggleWalletConfig: () => void;
   useEnhancedConfig: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { address } = useAccount();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const pathname = usePathname();
+  const { address } = useAccount();
 
-  const isAuthenticated = !!address;
-  const isLandingPage = pathname === "/";
+  const isLanding = pathname === "/";
+  const isAuth = !!address;
 
+  /* Navbar background on scroll */
   useEffect(() => {
-    if (isLandingPage) {
-      const handleScroll = () => {
-        setIsScrolled(window.scrollY > 50);
-      };
+    if (!isLanding) return;
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isLanding]);
 
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }
-  }, [isLandingPage]);
+  /* Lock body scroll */
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsOpen(false);
-    }
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setOpen(false);
   };
 
   return (
-    <nav
-      className={
-        isLandingPage
-          ? `fixed top-0 w-full z-50 transition-all duration-300 ${
-              isScrolled
-                ? "bg-black/80 backdrop-blur-md border-b border-gray-800/50"
-                : "bg-transparent"
-            }`
-          : "bg-[#171717]"
-      }
-    >
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10">
-              <Image
-                src={VouchMeLogo}
-                alt="VouchMe Logo"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
-            <span className="text-white text-2xl font-bold">VouchMe</span>
+    <>
+      {/* NAVBAR */}
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all ${
+          scrolled
+            ? "bg-black/80 backdrop-blur border-b border-gray-800"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="h-20 px-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <Image src={VouchMeLogo} alt="VouchMe" width={36} height={36} />
+            <span className="text-white text-xl font-bold">VouchMe</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {isLandingPage && (
-              <>
+          <button
+            onClick={() => setOpen(true)}
+            className="md:hidden text-white p-2"
+          >
+            <Menu size={26} />
+          </button>
+
+          <div className="hidden md:flex">
+            <ConnectButton />
+          </div>
+        </div>
+      </nav>
+
+      {/* BACKDROP */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* HALF-SCREEN MENU SHEET */}
+      {open && (
+        <div
+          className="fixed top-0 left-0 right-0 z-50 md:hidden shadow-2xl"
+          style={{ height: SHEET_HEIGHT, backgroundColor: NAVY_BG }}
+        >
+          {/* HEADER */}
+          <div className="h-16 px-5 flex items-center justify-between border-b border-white/10">
+            <span className="text-white text-lg font-semibold">Menu</span>
+            <button onClick={() => setOpen(false)} className="text-white">
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* CONTENT */}
+          <div className="h-[calc(50vh-64px)] overflow-y-auto px-6 py-6 space-y-8 text-white">
+            {/* NAV LINKS */}
+            {isLanding && (
+              <div className="space-y-4">
                 <button
-                  onClick={() => scrollToSection("features")}
-                  className="text-gray-300 hover:text-white transition-colors font-semibold"
+                  onClick={() => scrollTo("features")}
+                  className="block w-full text-left text-base font-medium tracking-wide"
                 >
                   Why VouchMe
                 </button>
                 <button
-                  onClick={() => scrollToSection("footer")}
-                  className="text-gray-300 hover:text-white transition-colors font-semibold"
+                  onClick={() => scrollTo("footer")}
+                  className="block w-full text-left text-base font-medium tracking-wide"
                 >
                   About Us
                 </button>
-              </>
+              </div>
             )}
 
-            {!isAuthenticated && (
+            {/* WALLET SECTION */}
+            <div className="border-t border-white/10 pt-6">
+              <div className="bg-white/5 rounded-2xl px-5 py-4 flex items-center justify-between">
+                <span className="text-sm opacity-80">Wallet</span>
+                <ConnectButton />
+              </div>
+            </div>
+
+            {/* CONFIG ACTION */}
+            {!isAuth && (
               <button
-                onClick={toggleWalletConfig}
-                className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                onClick={() => {
+                  toggleWalletConfig();
+                  setOpen(false);
+                }}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-2xl font-semibold transition"
               >
                 {useEnhancedConfig
                   ? "Disable ReOwn Wallets"
                   : "Enable ReOwn Wallets"}
               </button>
             )}
-
-            <ConnectButton />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-300 hover:text-white p-2"
-            >
-              {isOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-3">
-              {isLandingPage && (
-                <>
-                  <button
-                    onClick={() => scrollToSection("features")}
-                    className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                  >
-                    Why VouchMe
-                  </button>
-                  <button
-                    onClick={() => scrollToSection("footer")}
-                    className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                  >
-                    About Us
-                  </button>
-                </>
-              )}
-
-              {!isLandingPage && isAuthenticated && (
-                <>
-                  <Link
-                    href="/dashboard"
-                    className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="block w-full text-left px-3 py-2 text-gray-300 hover:text-white transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                </>
-              )}
-
-              {!isAuthenticated && (
-                <button
-                  onClick={toggleWalletConfig}
-                  className="block w-auto text-left px-3 py-2 bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-medium transition-colors"
-                >
-                  {useEnhancedConfig
-                    ? "Disable ReOwn Wallets"
-                    : "Enable ReOwn Wallets"}
-                </button>
-              )}
-
-              <div className="py-2">
-                <ConnectButton />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </nav>
+      )}
+    </>
   );
 };
 
