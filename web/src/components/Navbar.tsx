@@ -10,7 +10,7 @@ import { useAccount } from "wagmi";
 import VouchMeLogo from "../image/VouchMeLogo.png";
 
 const NAVY_BG = "#0B1C2D";
-const SHEET_HEIGHT = "50vh"; // half page
+const SHEET_HEIGHT = "100vh";
 
 const Navbar = ({
   toggleWalletConfig,
@@ -30,9 +30,15 @@ const Navbar = ({
 
   /* Navbar background on scroll */
   useEffect(() => {
-    if (!isLanding) return;
+    if (!isLanding) {
+      setScrolled(true);
+      return;
+    }
+
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
+    onScroll();
+
     return () => window.removeEventListener("scroll", onScroll);
   }, [isLanding]);
 
@@ -54,7 +60,7 @@ const Navbar = ({
       {/* NAVBAR */}
       <nav
         className={`fixed top-0 w-full z-50 transition-all ${
-          scrolled
+          !isLanding || scrolled
             ? "bg-black/80 backdrop-blur border-b border-gray-800"
             : "bg-transparent"
         }`}
@@ -81,15 +87,15 @@ const Navbar = ({
       {/* BACKDROP */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* HALF-SCREEN MENU SHEET */}
+      {/* FULL-SCREEN MENU */}
       {open && (
         <div
-          className="fixed top-0 left-0 right-0 z-50 md:hidden shadow-2xl"
+          className="fixed inset-0 z-50 md:hidden"
           style={{ height: SHEET_HEIGHT, backgroundColor: NAVY_BG }}
         >
           {/* HEADER */}
@@ -101,8 +107,7 @@ const Navbar = ({
           </div>
 
           {/* CONTENT */}
-          <div className="h-[calc(50vh-64px)] overflow-y-auto px-6 py-6 space-y-8 text-white">
-            {/* NAV LINKS */}
+          <div className="h-[calc(100vh-64px)] overflow-y-auto px-6 py-6 space-y-8 text-white">
             {isLanding && (
               <div className="space-y-4">
                 <button
@@ -120,7 +125,6 @@ const Navbar = ({
               </div>
             )}
 
-            {/* WALLET SECTION */}
             <div className="border-t border-white/10 pt-6">
               <div className="bg-white/5 rounded-2xl px-5 py-4 flex items-center justify-between">
                 <span className="text-sm opacity-80">Wallet</span>
@@ -128,7 +132,6 @@ const Navbar = ({
               </div>
             </div>
 
-            {/* CONFIG ACTION */}
             {!isAuth && (
               <button
                 onClick={() => {
