@@ -166,7 +166,7 @@ contract VouchMe is ERC721URIStorage {
         uint256 total = _receivedTestimonials[receiver].length;
 
         if (start >= total) {
-            return new uint256;
+            return new uint256[](0);
         }
 
         uint256 end = start + limit;
