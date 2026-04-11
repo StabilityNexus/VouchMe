@@ -133,6 +133,59 @@ contract VouchMeTest is Test {
         assertEq(retrievedBio, newBio);
     }
 
+    // totalProfiles should only increment on the very first setProfile call per address
+    function testTotalProfilesIncrementOnlyOnce() public {
+        assertEq(vouchMe.getTotalProfiles(), 0);
+
+        vm.prank(alice);
+        vouchMe.setProfile("Alice", "alice@example.com", "Bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+
+        // Subsequent updates must NOT increment the counter
+        vm.prank(alice);
+        vouchMe.setProfile("Alice Updated", "alice2@example.com", "New bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+    }
+
+    // Exploit scenario: clear name then re-register must not inflate totalProfiles
+    function testTotalProfilesNotInflatedByNameClearing() public {
+        // Step 1: register
+        vm.prank(alice);
+        vouchMe.setProfile("Alice", "alice@example.com", "Bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+
+        // Step 2: clear the name (sets name to "")
+        vm.prank(alice);
+        vouchMe.setProfile("", "alice@example.com", "Bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+
+        // Step 3: re-register with a non-empty name — must NOT count as a new profile
+        vm.prank(alice);
+        vouchMe.setProfile("Alice", "alice@example.com", "Bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+
+        // Repeat the cycle N more times — counter must remain at 1
+        for (uint256 i = 0; i < 5; i++) {
+            vm.prank(alice);
+            vouchMe.setProfile("", "", "");
+
+            vm.prank(alice);
+            vouchMe.setProfile("Alice", "alice@example.com", "Bio");
+        }
+        assertEq(vouchMe.getTotalProfiles(), 1);
+    }
+
+    // Two distinct addresses each register once — counter must reach exactly 2
+    function testTotalProfilesCountsDistinctUsers() public {
+        vm.prank(alice);
+        vouchMe.setProfile("Alice", "alice@example.com", "Alice bio");
+        assertEq(vouchMe.getTotalProfiles(), 1);
+
+        vm.prank(bob);
+        vouchMe.setProfile("Bob", "bob@example.com", "Bob bio");
+        assertEq(vouchMe.getTotalProfiles(), 2);
+    }
+
     /////////////////////////////////////////////////
     // TESTIMONIAL CREATION TESTS
     /////////////////////////////////////////////////

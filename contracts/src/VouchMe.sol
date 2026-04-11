@@ -29,6 +29,9 @@ contract VouchMe is ERC721URIStorage {
     // Maps user address to their profile data
     mapping(address => Profile) public userProfiles;
     
+    // Tracks whether an address has ever registered a profile
+    mapping(address => bool) private profileExists;
+    
     struct Profile {
         string name;
         string contact;
@@ -238,8 +241,8 @@ contract VouchMe is ERC721URIStorage {
         string calldata contact,
         string calldata bio
     ) external {
-        // Check if this is a new profile (first time setting)
-        bool isNewProfile = bytes(userProfiles[msg.sender].name).length == 0;
+        // Check if this is a new profile (first time registering)
+        bool isNewProfile = !profileExists[msg.sender];
         
         userProfiles[msg.sender] = Profile({
             name: name,
@@ -249,6 +252,7 @@ contract VouchMe is ERC721URIStorage {
         
         // Increment profiles counter only for new profiles
         if (isNewProfile) {
+            profileExists[msg.sender] = true;
             totalProfiles++;
         }
         
