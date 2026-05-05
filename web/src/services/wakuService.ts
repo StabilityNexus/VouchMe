@@ -72,7 +72,7 @@ class FixedWakuService {
   constructor() {
     if (typeof window !== "undefined") {
       console.log(
-        "Service initialized with testimonial removal support (memory-only)"
+        "Service initialized with testimonial removal support (memory-only)",
       );
       // Add service to window for testing (only in development)
       (
@@ -83,7 +83,7 @@ class FixedWakuService {
 
   // 🔧 Correct decode method
   private decodeTestimonialMessage(
-    payload: Uint8Array
+    payload: Uint8Array,
   ): WakuTestimonial | null {
     try {
       const messageObj = TestimonialMessage.decode(payload);
@@ -187,10 +187,10 @@ class FixedWakuService {
   }
 
   async manualRefreshTestimonials(
-    receiverAddress: string
+    receiverAddress: string,
   ): Promise<WakuTestimonial[]> {
     console.log(
-      `Starting fast and consistent Store query for ${receiverAddress}`
+      `Starting fast and consistent Store query for ${receiverAddress}`,
     );
 
     try {
@@ -212,7 +212,7 @@ class FixedWakuService {
       const testimonials = await this.executeUniformQuery(receiverAddress);
 
       console.log(
-        `Query completed successfully! Found ${testimonials.length} testimonials`
+        `Query completed successfully! Found ${testimonials.length} testimonials`,
       );
       return testimonials;
     } catch (error) {
@@ -289,7 +289,7 @@ class FixedWakuService {
   }
 
   private async executeUniformQuery(
-    receiverAddress: string
+    receiverAddress: string,
   ): Promise<WakuTestimonial[]> {
     const testimonials: WakuTestimonial[] = [];
     const decoder = createDecoder(this.contentTopic);
@@ -351,20 +351,20 @@ class FixedWakuService {
     const queryPromise = this.node!.store.queryWithOrderedCallback(
       [decoder],
       callback,
-      queryOptions
+      queryOptions,
     );
 
     const timeoutPromise = new Promise<void>((_, reject) => {
       setTimeout(
         () => reject(new Error("Query timeout after 15 seconds")),
-        15000 // Reduced timeout for faster UX
+        15000, // Reduced timeout for faster UX
       );
     });
 
     await Promise.race([queryPromise, timeoutPromise]);
 
     console.log(
-      `Query completed! Processed ${messageCount} messages, found ${testimonials.length} testimonials`
+      `Query completed! Processed ${messageCount} messages, found ${testimonials.length} testimonials`,
     );
 
     return testimonials.sort((a, b) => b.timestamp - a.timestamp);
@@ -372,7 +372,7 @@ class FixedWakuService {
 
   // Strategy 3: Fallback query without time filter
   private async executeFallbackQuery(
-    receiverAddress: string
+    receiverAddress: string,
   ): Promise<WakuTestimonial[]> {
     const testimonials: WakuTestimonial[] = [];
     const decoder = createDecoder(this.contentTopic);
@@ -426,7 +426,7 @@ class FixedWakuService {
     const queryPromise = this.node!.store.queryWithOrderedCallback(
       [decoder],
       callback,
-      queryOptions
+      queryOptions,
     );
     const timeoutPromise = new Promise<void>((_, reject) => {
       setTimeout(() => reject(new Error("Fallback query timeout")), 40000); // 40s timeout for thorough search
@@ -435,7 +435,7 @@ class FixedWakuService {
     await Promise.race([queryPromise, timeoutPromise]);
 
     console.log(
-      `Query completed! Processed ${messageCount} messages, found ${testimonials.length} testimonials`
+      `Query completed! Processed ${messageCount} messages, found ${testimonials.length} testimonials`,
     );
 
     return testimonials.sort((a, b) => b.timestamp - a.timestamp);
@@ -444,7 +444,7 @@ class FixedWakuService {
   // Remove testimonial from Waku network
   async removeTestimonialFromWaku(
     testimonialId: string,
-    senderAddress: string
+    senderAddress: string,
   ): Promise<void> {
     console.log(`Removing testimonial ${testimonialId} from Waku network`);
 
@@ -486,7 +486,7 @@ class FixedWakuService {
       const serializedMessage = RemovalMessage.encode(protoMessage).finish();
 
       console.log(
-        `Removal message serialized (${serializedMessage.length} bytes)`
+        `Removal message serialized (${serializedMessage.length} bytes)`,
       );
 
       const sendResult = await this.node.lightPush.send(encoder, {
@@ -512,7 +512,7 @@ class FixedWakuService {
     try {
       await this.queryRemovalMessages();
       console.log(
-        `System initialized with ${this.removedTestimonials.size} removed testimonials`
+        `System initialized with ${this.removedTestimonials.size} removed testimonials`,
       );
     } catch (error) {
       console.warn("Failed to initialize removal system:", error);
@@ -565,7 +565,7 @@ class FixedWakuService {
         ) {
           this.removedTestimonials.add(removalData.originalTestimonialId);
           console.log(
-            `Found removal for testimonial ${removalData.originalTestimonialId}`
+            `Found removal for testimonial ${removalData.originalTestimonialId}`,
           );
         }
 
@@ -591,10 +591,10 @@ class FixedWakuService {
       await this.node.store.queryWithOrderedCallback(
         [decoder],
         callback,
-        queryOptions
+        queryOptions,
       );
       console.log(
-        `Query complete. Total removed testimonials: ${this.removedTestimonials.size}`
+        `Query complete. Total removed testimonials: ${this.removedTestimonials.size}`,
       );
     } catch (error) {
       console.error("Failed to query removal messages:", error);
@@ -610,7 +610,7 @@ class FixedWakuService {
     return this.removedTestimonials.has(testimonialId);
   }
   async sendTestimonial(
-    testimonial: Omit<WakuTestimonial, "id" | "timestamp" | "type">
+    testimonial: Omit<WakuTestimonial, "id" | "timestamp" | "type">,
   ): Promise<void> {
     console.log("Sending testimonial");
 
@@ -691,7 +691,7 @@ class FixedWakuService {
 
   onTestimonialReceived(
     address: string,
-    handler: (testimonial: WakuTestimonial) => void
+    handler: (testimonial: WakuTestimonial) => void,
   ): () => void {
     const key = address.toLowerCase();
     this.messageHandlers.set(key, handler);
@@ -709,7 +709,7 @@ class FixedWakuService {
   // 🔔 PUBLIC: Start real-time testimonial listening for an address
   async startRealtimeListening(
     address: string,
-    handler: (testimonial: WakuTestimonial) => void
+    handler: (testimonial: WakuTestimonial) => void,
   ): Promise<void> {
     if (!this.isConnected) {
       console.log("Node not connected, skipping live listening");
@@ -723,7 +723,7 @@ class FixedWakuService {
   // 🎯 CRITICAL: Real-time message listening using Filter protocol
   private async startLiveMessageListening(
     address: string,
-    handler: (testimonial: WakuTestimonial) => void
+    handler: (testimonial: WakuTestimonial) => void,
   ): Promise<void> {
     try {
       if (!this.node) {
@@ -748,7 +748,7 @@ class FixedWakuService {
           }
 
           const testimonial = this.decodeTestimonialMessage(
-            wakuMessage.payload
+            wakuMessage.payload,
           );
           if (!testimonial) {
             console.log("Failed to decode live message");
@@ -782,7 +782,7 @@ class FixedWakuService {
             }
           } else {
             console.log(
-              `Live testimonial for different address: ${testimonial.receiverAddress} (looking for ${address})`
+              `Live testimonial for different address: ${testimonial.receiverAddress} (looking for ${address})`,
             );
           }
         } catch (error) {
@@ -800,7 +800,7 @@ class FixedWakuService {
 
   onNotificationReceived(
     address: string,
-    handler: (notification: WakuNotification) => void
+    handler: (notification: WakuNotification) => void,
   ): () => void {
     const key = address.toLowerCase();
     this.notificationHandlers.set(key, handler);

@@ -3,7 +3,7 @@
 <!-- Organization Logo -->
 <div align="center" style="display: flex; align-items: center; justify-content: center; gap: 16px;">
   <img alt="Stability Nexus" src="web/public/stability.svg" width="175">
-  <img src="public/todo-project-logo.svg" width="175" />
+  <img src="web/public/VouchMe.png" alt="VouchMe" width="175" />
 </div>
 
 &nbsp;
@@ -11,7 +11,7 @@
 <!-- Organization Name -->
 <div align="center">
 
-[![Static Badge](https://img.shields.io/badge/Stability_Nexus-/TODO-228B22?style=for-the-badge&labelColor=FFC517)](https://TODO.stability.nexus/)
+[![Static Badge](https://img.shields.io/badge/Stability_Nexus-/VouchMe-228B22?style=for-the-badge&labelColor=FFC517)](https://vouchme.stability.nexus/)
 
 <!-- Correct deployed url to be added -->
 

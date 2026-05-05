@@ -2,6 +2,7 @@ import React from "react";
 import { Github } from "lucide-react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear()
   return (
     <footer id="footer" className="bg-black text-gray-400 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,7 +88,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <p className="text-center text-xs pt-8 border-t border-gray-800 mt-8">
-          © 2025 THE STABLE ORDER. All rights reserved.
+          © {currentYear} THE STABLE ORDER. All rights reserved.
         </p>
       </div>
     </footer>

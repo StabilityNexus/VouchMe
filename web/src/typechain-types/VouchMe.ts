@@ -60,8 +60,13 @@ export interface VouchMeInterface extends Interface {
       | "balanceOf"
       | "createTestimonial"
       | "deleteTestimonial"
+      | "fee"
+      | "freeThreshold"
       | "getApproved"
       | "getReceivedTestimonials"
+      | "getRemainingFreeTestimonials"
+      | "getRequiredFee"
+      | "getRequiredFeeForCreate"
       | "getTestimonialCount"
       | "getTestimonialDetails"
       | "getTotalProfiles"
@@ -69,17 +74,24 @@ export interface VouchMeInterface extends Interface {
       | "hasExistingTestimonial"
       | "isApprovedForAll"
       | "name"
+      | "owner"
       | "ownerOf"
+      | "renounceOwnership"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setFee"
+      | "setFreeThreshold"
       | "setProfile"
+      | "setTreasury"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
       | "totalProfiles"
       | "totalTestimonials"
       | "transferFrom"
+      | "transferOwnership"
+      | "treasury"
       | "userProfiles"
   ): FunctionFragment;
 
@@ -88,13 +100,18 @@ export interface VouchMeInterface extends Interface {
       | "Approval"
       | "ApprovalForAll"
       | "BatchMetadataUpdate"
+      | "FeePaid"
+      | "FeeUpdated"
+      | "FreeThresholdUpdated"
       | "MetadataUpdate"
+      | "OwnershipTransferred"
       | "ProfileUpdated"
       | "TestimonialCreated"
       | "TestimonialDeleted"
       | "TestimonialUpdated"
       | "TestimonialVerified"
       | "Transfer"
+      | "TreasuryUpdated"
   ): EventFragment;
 
   encodeFunctionData(
@@ -113,6 +130,11 @@ export interface VouchMeInterface extends Interface {
     functionFragment: "deleteTestimonial",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "fee", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "freeThreshold",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -120,6 +142,18 @@ export interface VouchMeInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getReceivedTestimonials",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRemainingFreeTestimonials",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRequiredFee",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRequiredFeeForCreate",
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getTestimonialCount",
@@ -146,9 +180,14 @@ export interface VouchMeInterface extends Interface {
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "renounceOwnership",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -163,8 +202,20 @@ export interface VouchMeInterface extends Interface {
     values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setFee",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setFreeThreshold",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setProfile",
     values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTreasury",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -188,6 +239,11 @@ export interface VouchMeInterface extends Interface {
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "userProfiles",
     values: [AddressLike]
   ): string;
@@ -202,12 +258,29 @@ export interface VouchMeInterface extends Interface {
     functionFragment: "deleteTestimonial",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "freeThreshold",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getReceivedTestimonials",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRemainingFreeTestimonials",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRequiredFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRequiredFeeForCreate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -235,7 +308,12 @@ export interface VouchMeInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
     data: BytesLike
@@ -248,7 +326,16 @@ export interface VouchMeInterface extends Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setFreeThreshold",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "setProfile", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setTreasury",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -267,6 +354,11 @@ export interface VouchMeInterface extends Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "userProfiles",
     data: BytesLike
@@ -329,11 +421,66 @@ export namespace BatchMetadataUpdateEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace FeePaidEvent {
+  export type InputTuple = [payer: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [payer: string, amount: bigint];
+  export interface OutputObject {
+    payer: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FeeUpdatedEvent {
+  export type InputTuple = [oldFee: BigNumberish, newFee: BigNumberish];
+  export type OutputTuple = [oldFee: bigint, newFee: bigint];
+  export interface OutputObject {
+    oldFee: bigint;
+    newFee: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FreeThresholdUpdatedEvent {
+  export type InputTuple = [
+    oldThreshold: BigNumberish,
+    newThreshold: BigNumberish
+  ];
+  export type OutputTuple = [oldThreshold: bigint, newThreshold: bigint];
+  export interface OutputObject {
+    oldThreshold: bigint;
+    newThreshold: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace MetadataUpdateEvent {
   export type InputTuple = [_tokenId: BigNumberish];
   export type OutputTuple = [_tokenId: bigint];
   export interface OutputObject {
     _tokenId: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OwnershipTransferredEvent {
+  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [previousOwner: string, newOwner: string];
+  export interface OutputObject {
+    previousOwner: string;
+    newOwner: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -437,6 +584,19 @@ export namespace TransferEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace TreasuryUpdatedEvent {
+  export type InputTuple = [oldTreasury: AddressLike, newTreasury: AddressLike];
+  export type OutputTuple = [oldTreasury: string, newTreasury: string];
+  export interface OutputObject {
+    oldTreasury: string;
+    newTreasury: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export interface VouchMe extends BaseContract {
   connect(runner?: ContractRunner | null): VouchMe;
   waitForDeployment(): Promise<this>;
@@ -497,7 +657,7 @@ export interface VouchMe extends BaseContract {
       signature: BytesLike
     ],
     [bigint],
-    "nonpayable"
+    "payable"
   >;
 
   deleteTestimonial: TypedContractMethod<
@@ -506,11 +666,29 @@ export interface VouchMe extends BaseContract {
     "nonpayable"
   >;
 
+  fee: TypedContractMethod<[], [bigint], "view">;
+
+  freeThreshold: TypedContractMethod<[], [bigint], "view">;
+
   getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
 
   getReceivedTestimonials: TypedContractMethod<
     [receiver: AddressLike],
     [bigint[]],
+    "view"
+  >;
+
+  getRemainingFreeTestimonials: TypedContractMethod<
+    [user: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  getRequiredFee: TypedContractMethod<[user: AddressLike], [bigint], "view">;
+
+  getRequiredFeeForCreate: TypedContractMethod<
+    [sender: AddressLike, receiver: AddressLike],
+    [bigint],
     "view"
   >;
 
@@ -544,7 +722,11 @@ export interface VouchMe extends BaseContract {
 
   name: TypedContractMethod<[], [string], "view">;
 
+  owner: TypedContractMethod<[], [string], "view">;
+
   ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+
+  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
   "safeTransferFrom(address,address,uint256)": TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
@@ -569,8 +751,22 @@ export interface VouchMe extends BaseContract {
     "nonpayable"
   >;
 
+  setFee: TypedContractMethod<[_fee: BigNumberish], [void], "nonpayable">;
+
+  setFreeThreshold: TypedContractMethod<
+    [_threshold: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   setProfile: TypedContractMethod<
     [name: string, contact: string, bio: string],
+    [void],
+    "nonpayable"
+  >;
+
+  setTreasury: TypedContractMethod<
+    [_treasury: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -594,6 +790,14 @@ export interface VouchMe extends BaseContract {
     [void],
     "nonpayable"
   >;
+
+  transferOwnership: TypedContractMethod<
+    [newOwner: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  treasury: TypedContractMethod<[], [string], "view">;
 
   userProfiles: TypedContractMethod<
     [arg0: AddressLike],
@@ -626,17 +830,36 @@ export interface VouchMe extends BaseContract {
       signature: BytesLike
     ],
     [bigint],
-    "nonpayable"
+    "payable"
   >;
   getFunction(
     nameOrSignature: "deleteTestimonial"
   ): TypedContractMethod<[tokenId: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "fee"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "freeThreshold"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getApproved"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
   getFunction(
     nameOrSignature: "getReceivedTestimonials"
   ): TypedContractMethod<[receiver: AddressLike], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getRemainingFreeTestimonials"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getRequiredFee"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getRequiredFeeForCreate"
+  ): TypedContractMethod<
+    [sender: AddressLike, receiver: AddressLike],
+    [bigint],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getTestimonialCount"
   ): TypedContractMethod<[receiver: AddressLike], [bigint], "view">;
@@ -671,8 +894,14 @@ export interface VouchMe extends BaseContract {
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "owner"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "ownerOf"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "renounceOwnership"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "safeTransferFrom(address,address,uint256)"
   ): TypedContractMethod<
@@ -700,12 +929,21 @@ export interface VouchMe extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setFee"
+  ): TypedContractMethod<[_fee: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setFreeThreshold"
+  ): TypedContractMethod<[_threshold: BigNumberish], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "setProfile"
   ): TypedContractMethod<
     [name: string, contact: string, bio: string],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "setTreasury"
+  ): TypedContractMethod<[_treasury: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "supportsInterface"
   ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
@@ -728,6 +966,12 @@ export interface VouchMe extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "transferOwnership"
+  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "treasury"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "userProfiles"
   ): TypedContractMethod<
@@ -758,11 +1002,39 @@ export interface VouchMe extends BaseContract {
     BatchMetadataUpdateEvent.OutputObject
   >;
   getEvent(
+    key: "FeePaid"
+  ): TypedContractEvent<
+    FeePaidEvent.InputTuple,
+    FeePaidEvent.OutputTuple,
+    FeePaidEvent.OutputObject
+  >;
+  getEvent(
+    key: "FeeUpdated"
+  ): TypedContractEvent<
+    FeeUpdatedEvent.InputTuple,
+    FeeUpdatedEvent.OutputTuple,
+    FeeUpdatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "FreeThresholdUpdated"
+  ): TypedContractEvent<
+    FreeThresholdUpdatedEvent.InputTuple,
+    FreeThresholdUpdatedEvent.OutputTuple,
+    FreeThresholdUpdatedEvent.OutputObject
+  >;
+  getEvent(
     key: "MetadataUpdate"
   ): TypedContractEvent<
     MetadataUpdateEvent.InputTuple,
     MetadataUpdateEvent.OutputTuple,
     MetadataUpdateEvent.OutputObject
+  >;
+  getEvent(
+    key: "OwnershipTransferred"
+  ): TypedContractEvent<
+    OwnershipTransferredEvent.InputTuple,
+    OwnershipTransferredEvent.OutputTuple,
+    OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
     key: "ProfileUpdated"
@@ -806,6 +1078,13 @@ export interface VouchMe extends BaseContract {
     TransferEvent.OutputTuple,
     TransferEvent.OutputObject
   >;
+  getEvent(
+    key: "TreasuryUpdated"
+  ): TypedContractEvent<
+    TreasuryUpdatedEvent.InputTuple,
+    TreasuryUpdatedEvent.OutputTuple,
+    TreasuryUpdatedEvent.OutputObject
+  >;
 
   filters: {
     "Approval(address,address,uint256)": TypedContractEvent<
@@ -841,6 +1120,39 @@ export interface VouchMe extends BaseContract {
       BatchMetadataUpdateEvent.OutputObject
     >;
 
+    "FeePaid(address,uint256)": TypedContractEvent<
+      FeePaidEvent.InputTuple,
+      FeePaidEvent.OutputTuple,
+      FeePaidEvent.OutputObject
+    >;
+    FeePaid: TypedContractEvent<
+      FeePaidEvent.InputTuple,
+      FeePaidEvent.OutputTuple,
+      FeePaidEvent.OutputObject
+    >;
+
+    "FeeUpdated(uint256,uint256)": TypedContractEvent<
+      FeeUpdatedEvent.InputTuple,
+      FeeUpdatedEvent.OutputTuple,
+      FeeUpdatedEvent.OutputObject
+    >;
+    FeeUpdated: TypedContractEvent<
+      FeeUpdatedEvent.InputTuple,
+      FeeUpdatedEvent.OutputTuple,
+      FeeUpdatedEvent.OutputObject
+    >;
+
+    "FreeThresholdUpdated(uint256,uint256)": TypedContractEvent<
+      FreeThresholdUpdatedEvent.InputTuple,
+      FreeThresholdUpdatedEvent.OutputTuple,
+      FreeThresholdUpdatedEvent.OutputObject
+    >;
+    FreeThresholdUpdated: TypedContractEvent<
+      FreeThresholdUpdatedEvent.InputTuple,
+      FreeThresholdUpdatedEvent.OutputTuple,
+      FreeThresholdUpdatedEvent.OutputObject
+    >;
+
     "MetadataUpdate(uint256)": TypedContractEvent<
       MetadataUpdateEvent.InputTuple,
       MetadataUpdateEvent.OutputTuple,
@@ -850,6 +1162,17 @@ export interface VouchMe extends BaseContract {
       MetadataUpdateEvent.InputTuple,
       MetadataUpdateEvent.OutputTuple,
       MetadataUpdateEvent.OutputObject
+    >;
+
+    "OwnershipTransferred(address,address)": TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
+    >;
+    OwnershipTransferred: TypedContractEvent<
+      OwnershipTransferredEvent.InputTuple,
+      OwnershipTransferredEvent.OutputTuple,
+      OwnershipTransferredEvent.OutputObject
     >;
 
     "ProfileUpdated(address)": TypedContractEvent<
@@ -916,6 +1239,17 @@ export interface VouchMe extends BaseContract {
       TransferEvent.InputTuple,
       TransferEvent.OutputTuple,
       TransferEvent.OutputObject
+    >;
+
+    "TreasuryUpdated(address,address)": TypedContractEvent<
+      TreasuryUpdatedEvent.InputTuple,
+      TreasuryUpdatedEvent.OutputTuple,
+      TreasuryUpdatedEvent.OutputObject
+    >;
+    TreasuryUpdated: TypedContractEvent<
+      TreasuryUpdatedEvent.InputTuple,
+      TreasuryUpdatedEvent.OutputTuple,
+      TreasuryUpdatedEvent.OutputObject
     >;
   };
 }

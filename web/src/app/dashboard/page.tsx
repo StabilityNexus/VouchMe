@@ -183,7 +183,7 @@ export default function Dashboard() {
       activeView === "received"
     ) {
       console.log(
-        "Dashboard: Auto-refreshing testimonials on first visit to received section"
+        "Dashboard: Auto-refreshing testimonials on first visit to received section",
       );
       const autoRefresh = async () => {
         try {
@@ -281,7 +281,7 @@ export default function Dashboard() {
         }
 
         const details = await Promise.all(
-          testimonialIds.map((id) => contract.getTestimonialDetails(id))
+          testimonialIds.map((id) => contract.getTestimonialDetails(id)),
         );
 
         const formattedTestimonials = details.map((detail, index) => ({
@@ -297,7 +297,7 @@ export default function Dashboard() {
         // Only show success toast if testimonials are actually loaded
         if (formattedTestimonials.length > 0) {
           showSuccess(
-            `Successfully loaded ${formattedTestimonials.length} testimonials`
+            `Successfully loaded ${formattedTestimonials.length} testimonials`,
           );
         }
       } catch (error) {
@@ -397,7 +397,7 @@ export default function Dashboard() {
     const getCompletionStatus = () => {
       const total = 3;
       const completed = [profile.name, profile.contact, profile.bio].filter(
-        Boolean
+        Boolean,
       ).length;
       return {
         completed,
@@ -590,7 +590,7 @@ export default function Dashboard() {
       const existingFromSender = testimonials.find(
         (testimonial) =>
           testimonial.fromAddress.toLowerCase() ===
-          signedData.senderAddress.toLowerCase()
+          signedData.senderAddress.toLowerCase(),
       );
 
       if (existingFromSender) {
@@ -626,13 +626,41 @@ export default function Dashboard() {
       const contract = VouchMeFactory.connect(CONTRACT_ADDRESS, provider);
       const signer = await provider.getSigner();
       const contractWithSigner = contract.connect(signer);
+      const receiverAddress = await signer.getAddress();
+
+      const isReplacing = testimonials.some(
+        (testimonial) =>
+          testimonial.fromAddress.toLowerCase() ===
+          signedData.senderAddress.toLowerCase(),
+      );
+
+      // Prefer replacement-aware quote, but gracefully fall back for older deployments
+      // that don't expose getRequiredFeeForCreate yet.
+      let requiredFee: bigint;
+      if (isReplacing) {
+        try {
+          requiredFee = await contract.getRequiredFeeForCreate(
+            signedData.senderAddress,
+            receiverAddress,
+          );
+        } catch (feeQuoteError) {
+          console.warn(
+            "Replacement-aware fee quote unavailable, falling back to getRequiredFee:",
+            feeQuoteError,
+          );
+          requiredFee = await contract.getRequiredFee(receiverAddress);
+        }
+      } else {
+        requiredFee = await contract.getRequiredFee(receiverAddress);
+      }
 
       const tx = await contractWithSigner.createTestimonial(
         signedData.senderAddress,
         signedData.content,
         signedData.giverName,
         signedData.profileUrl,
-        signedData.signature
+        signedData.signature,
+        { value: requiredFee },
       );
 
       console.log("Transaction sent:", tx.hash);
@@ -647,7 +675,7 @@ export default function Dashboard() {
 
         if (testimonialIds && testimonialIds.length > 0) {
           const details = await Promise.all(
-            testimonialIds.map((id) => contract.getTestimonialDetails(id))
+            testimonialIds.map((id) => contract.getTestimonialDetails(id)),
           );
 
           const formattedTestimonials = details.map((detail, index) => ({
@@ -683,7 +711,7 @@ export default function Dashboard() {
         removeTestimonial(window.pendingWakuTestimonialId);
         window.pendingWakuTestimonialId = null;
         showSuccess(
-          "Testimonial accepted, added to blockchain, and removed from pending list"
+          "Testimonial accepted, added to blockchain, and removed from pending list",
         );
       }
     }
@@ -721,7 +749,7 @@ export default function Dashboard() {
 
       // Remove from local state
       setTestimonials((prev) =>
-        prev.filter((t) => t.tokenId !== testimonial.tokenId)
+        prev.filter((t) => t.tokenId !== testimonial.tokenId),
       );
 
       // Close modal
@@ -764,7 +792,7 @@ export default function Dashboard() {
           const endLength = Math.max(3, remainingSpace - startLength);
           const truncatedAddress = `${addressParam.slice(
             0,
-            startLength
+            startLength,
           )}...${addressParam.slice(-endLength)}`;
           return `${prefix}${truncatedAddress}`;
         }
@@ -792,28 +820,28 @@ export default function Dashboard() {
   // Social media sharing functions
   const shareOnX = (url: string, text: string) => {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-      text
+      text,
     )}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, "_blank", "noopener,noreferrer");
   };
 
   const shareOnLinkedIn = (url: string) => {
     const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-      url
+      url,
     )}`;
     window.open(linkedInUrl, "_blank", "noopener,noreferrer");
   };
 
   const shareOnWhatsApp = (url: string, text: string) => {
     const whatsAppUrl = `https://wa.me/?text=${encodeURIComponent(
-      `${text} ${url}`
+      `${text} ${url}`,
     )}`;
     window.open(whatsAppUrl, "_blank", "noopener,noreferrer");
   };
 
   const shareViaEmail = (url: string, subject: string, body: string) => {
     const emailUrl = `mailto:?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${encodeURIComponent(`${body}\n\n${url}`)}`;
     window.open(emailUrl);
   };
@@ -928,7 +956,7 @@ export default function Dashboard() {
       const tx = await contract.setProfile(
         tempProfile.name.trim(),
         tempProfile.contact.trim(),
-        tempProfile.bio.trim()
+        tempProfile.bio.trim(),
       );
 
       await tx.wait();
@@ -1184,10 +1212,10 @@ export default function Dashboard() {
                     <div className="text-3xl font-bold mb-1">
                       {Math.round(
                         ([profile.name, profile.contact, profile.bio].filter(
-                          Boolean
+                          Boolean,
                         ).length /
                           3) *
-                          100
+                          100,
                       )}
                       %
                     </div>
@@ -1282,7 +1310,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnX(
                                         shareableLink,
-                                        TESTIMONIAL_REQUEST_MESSAGE
+                                        TESTIMONIAL_REQUEST_MESSAGE,
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1316,7 +1344,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnWhatsApp(
                                         shareableLink,
-                                        TESTIMONIAL_REQUEST_MESSAGE
+                                        TESTIMONIAL_REQUEST_MESSAGE,
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1333,7 +1361,7 @@ export default function Dashboard() {
                                       shareViaEmail(
                                         shareableLink,
                                         "Request for Testimonial",
-                                        TESTIMONIAL_REQUEST_MESSAGE
+                                        TESTIMONIAL_REQUEST_MESSAGE,
                                       );
                                       setShowRequestShareMenu(false);
                                     }}
@@ -1358,7 +1386,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-3">
                             <div className="flex-1 font-mono text-sm text-gray-300 overflow-hidden">
                               {truncateLink(
-                                `${baseUrl}/testimonials?address=${address}`
+                                `${baseUrl}/testimonials?address=${address}`,
                               )}
                             </div>
                             <button
@@ -1402,7 +1430,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnX(
                                         `${baseUrl}/testimonials?address=${address}`,
-                                        SHOWCASE_MESSAGE
+                                        SHOWCASE_MESSAGE,
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1422,7 +1450,7 @@ export default function Dashboard() {
                                   <button
                                     onClick={() => {
                                       shareOnLinkedIn(
-                                        `${baseUrl}/testimonials?address=${address}`
+                                        `${baseUrl}/testimonials?address=${address}`,
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1438,7 +1466,7 @@ export default function Dashboard() {
                                     onClick={() => {
                                       shareOnWhatsApp(
                                         `${baseUrl}/testimonials?address=${address}`,
-                                        SHOWCASE_MESSAGE
+                                        SHOWCASE_MESSAGE,
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1455,7 +1483,7 @@ export default function Dashboard() {
                                       shareViaEmail(
                                         `${baseUrl}/testimonials?address=${address}`,
                                         "My Testimonials and Recommendations",
-                                        SHOWCASE_MESSAGE
+                                        SHOWCASE_MESSAGE,
                                       );
                                       setShowShowcaseShareMenu(false);
                                     }}
@@ -1615,12 +1643,12 @@ export default function Dashboard() {
                                 <div className="text-right">
                                   <div className="text-sm font-medium text-gray-300">
                                     {new Date(
-                                      testimonial.timestamp * 1000
+                                      testimonial.timestamp * 1000,
                                     ).toLocaleDateString()}
                                   </div>
                                   <div className="text-xs text-gray-500">
                                     {new Date(
-                                      testimonial.timestamp * 1000
+                                      testimonial.timestamp * 1000,
                                     ).toLocaleTimeString()}
                                   </div>
                                 </div>
@@ -1659,7 +1687,7 @@ export default function Dashboard() {
                                 <Calendar size={14} />
                                 <span>
                                   {new Date(
-                                    testimonial.timestamp * 1000
+                                    testimonial.timestamp * 1000,
                                   ).toLocaleDateString("en-US", {
                                     year: "numeric",
                                     month: "long",
@@ -1867,7 +1895,7 @@ export default function Dashboard() {
                             </span>
                             <div className="text-xs text-gray-500 mt-1">
                               {new Date(
-                                testimonial.timestamp
+                                testimonial.timestamp,
                               ).toLocaleDateString()}
                             </div>
                           </div>
@@ -1918,7 +1946,7 @@ export default function Dashboard() {
                                 const existingFromSender = testimonials.find(
                                   (t) =>
                                     t.fromAddress.toLowerCase() ===
-                                    testimonial.senderAddress.toLowerCase()
+                                    testimonial.senderAddress.toLowerCase(),
                                 );
 
                                 if (existingFromSender) {
@@ -1954,15 +1982,15 @@ export default function Dashboard() {
                                 // Remove from pending list after successful blockchain addition
                                 removeTestimonial(testimonial.id);
                                 showSuccess(
-                                  "Testimonial accepted and added to blockchain"
+                                  "Testimonial accepted and added to blockchain",
                                 );
                               } catch (error) {
                                 console.error(
                                   "Failed to accept testimonial:",
-                                  error
+                                  error,
                                 );
                                 showError(
-                                  "Failed to accept testimonial. Please try again."
+                                  "Failed to accept testimonial. Please try again.",
                                 );
                               }
                             }}
@@ -2276,7 +2304,7 @@ export default function Dashboard() {
                     <Calendar size={12} />
                     <span>
                       {new Date(
-                        existingTestimonial.timestamp * 1000
+                        existingTestimonial.timestamp * 1000,
                       ).toLocaleDateString()}
                     </span>
                   </div>
@@ -2365,7 +2393,7 @@ export default function Dashboard() {
                   <Calendar size={12} />
                   <span>
                     {new Date(
-                      deleteModal.testimonial.timestamp * 1000
+                      deleteModal.testimonial.timestamp * 1000,
                     ).toLocaleDateString()}
                   </span>
                 </div>
@@ -2441,7 +2469,7 @@ export default function Dashboard() {
             // Just remove from pending list (reject)
             removeTestimonial(actionModal.testimonial.id);
             showSuccess(
-              "Testimonial rejected and permanently removed from Waku network"
+              "Testimonial rejected and permanently removed from Waku network",
             );
 
             // Close modal
