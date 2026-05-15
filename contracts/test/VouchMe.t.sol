@@ -152,7 +152,7 @@ contract VouchMeTest is Test {
         assertEq(testimonial.giverName, GIVER_NAME);
         assertEq(testimonial.profileUrl, PROFILE_URL);
         assertTrue(testimonial.verified);
-        assertEq(testimonial.timestamp, block.timestamp);
+        assertEq(testimonial.timestamp, uint64(block.timestamp));
     }
 
     function testCreateTestimonialEmitsEvent() public {

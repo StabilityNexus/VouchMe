@@ -27,29 +27,29 @@ export declare namespace VouchMe {
   export type TestimonialStruct = {
     sender: AddressLike;
     receiver: AddressLike;
+    verified: boolean;
+    timestamp: BigNumberish;
     content: string;
     giverName: string;
     profileUrl: string;
-    timestamp: BigNumberish;
-    verified: boolean;
   };
 
   export type TestimonialStructOutput = [
     sender: string,
     receiver: string,
+    verified: boolean,
+    timestamp: bigint,
     content: string,
     giverName: string,
-    profileUrl: string,
-    timestamp: bigint,
-    verified: boolean
+    profileUrl: string
   ] & {
     sender: string;
     receiver: string;
+    verified: boolean;
+    timestamp: bigint;
     content: string;
     giverName: string;
     profileUrl: string;
-    timestamp: bigint;
-    verified: boolean;
   };
 }
 
