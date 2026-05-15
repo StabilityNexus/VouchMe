@@ -123,7 +123,7 @@ contract VouchMeFuzzTest is TestHelpers {
         assertEq(vouchMe.getTestimonialCount(receiver), 1);
         
         // Old testimonial should be deleted
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(tokenId1);
         
         // New testimonial should be accessible
@@ -170,7 +170,7 @@ contract VouchMeFuzzTest is TestHelpers {
         assertEq(vouchMe.getTestimonialCount(receiver), numTestimonials - 1);
         
         // Verify the deleted testimonial is not accessible
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(tokenIds[deleteIndex]);
         
         // Verify remaining testimonials are still accessible
