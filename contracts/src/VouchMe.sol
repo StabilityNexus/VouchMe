@@ -247,9 +247,9 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
                 '","content":"', testimonial.content,
                 '","giverName":"', testimonial.giverName,
                 '","profileUrl":"', testimonial.profileUrl,
-                '","verified":"', testimonial.verified ? "true" : "false",
-                '","timestamp":"', uint256(testimonial.timestamp).toString(),
-                '"}'
+                '","verified":', testimonial.verified ? "true" : "false",
+                ',"timestamp":', uint256(testimonial.timestamp).toString(),
+                '}'
             )
         );
     }
