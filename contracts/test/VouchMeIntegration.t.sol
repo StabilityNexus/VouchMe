@@ -113,7 +113,7 @@ contract VouchMeIntegrationTest is TestHelpers {
         assertEq(vouchMe.getTestimonialCount(alice), 2);
         
         // The old testimonial should be inaccessible
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(tokenId1);
         
         // The new testimonial should be accessible
@@ -272,7 +272,7 @@ contract VouchMeIntegrationTest is TestHelpers {
         );
         
         // Old testimonial should be replaced
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(tokenId);
         
         // New testimonial should be accessible

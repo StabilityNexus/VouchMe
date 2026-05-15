@@ -208,7 +208,7 @@ contract VouchMeTest is Test {
         assertEq(existingTokenId, secondTokenId);
         
         // Verify old testimonial is deleted
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(firstTokenId);
         
         // Verify new testimonial is accessible
@@ -235,13 +235,13 @@ contract VouchMeTest is Test {
         (bool exists,) = vouchMe.hasExistingTestimonial(bob, alice);
         assertFalse(exists);
         
-        vm.expectRevert("Testimonial has been deleted");
+        vm.expectRevert(VouchMe.TestimonialHasBeenDeleted.selector);
         vouchMe.getTestimonialDetails(tokenId);
     }
 
     function testCannotDeleteNonExistentTestimonial() public {
         vm.prank(alice);
-        vm.expectRevert("Only recipient can delete");
+        vm.expectRevert(VouchMe.OnlyRecipientCanDelete.selector);
         vouchMe.deleteTestimonial(999);
     }
 
@@ -249,7 +249,7 @@ contract VouchMeTest is Test {
         uint256 tokenId = createTestimonial(bob, alice, CONTENT, GIVER_NAME, PROFILE_URL);
         
         vm.prank(bob); // Bob tries to delete Alice's testimonial
-        vm.expectRevert("Only recipient can delete");
+        vm.expectRevert(VouchMe.OnlyRecipientCanDelete.selector);
         vouchMe.deleteTestimonial(tokenId);
     }
 
@@ -262,7 +262,7 @@ contract VouchMeTest is Test {
         
         // Try to delete again
         vm.prank(alice);
-        vm.expectRevert("Testimonial already deleted");
+        vm.expectRevert(VouchMe.TestimonialAlreadyDeleted.selector);
         vouchMe.deleteTestimonial(tokenId);
     }
 
@@ -323,7 +323,7 @@ contract VouchMeTest is Test {
         
         // This should revert due to signature verification failure
         vm.prank(alice);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(VouchMe.InvalidSignature.selector);
         vouchMe.createTestimonial(address(0), CONTENT, GIVER_NAME, PROFILE_URL, signature);
     }
 
@@ -369,12 +369,12 @@ contract VouchMeTest is Test {
         
         // Try to transfer from Alice to Charlie
         vm.prank(alice);
-        vm.expectRevert("Tokens are non-transferrable");
+        vm.expectRevert(VouchMe.TokensAreNonTransferrable.selector);
         vouchMe.transferFrom(alice, charlie, tokenId);
         
         // Try safeTransferFrom
         vm.prank(alice);
-        vm.expectRevert("Tokens are non-transferrable");
+        vm.expectRevert(VouchMe.TokensAreNonTransferrable.selector);
         vouchMe.safeTransferFrom(alice, charlie, tokenId);
     }
 }

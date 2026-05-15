@@ -54,7 +54,7 @@ contract VouchMeSignatureTest is TestHelpers {
         );
         
         vm.prank(alice);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(VouchMe.InvalidSignature.selector);
         vouchMe.createTestimonial(bob, CONTENT, GIVER_NAME, PROFILE_URL, invalidSignature);
     }
 
@@ -66,7 +66,7 @@ contract VouchMeSignatureTest is TestHelpers {
         
         // Try to use signature with different content
         vm.prank(alice);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(VouchMe.InvalidSignature.selector);
         vouchMe.createTestimonial(bob, "Tampered content", GIVER_NAME, PROFILE_URL, signature);
     }
 
@@ -78,7 +78,7 @@ contract VouchMeSignatureTest is TestHelpers {
         
         // Charlie tries to use the signature
         vm.prank(charlie);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(VouchMe.InvalidSignature.selector);
         vouchMe.createTestimonial(bob, CONTENT, GIVER_NAME, PROFILE_URL, signature);
     }
 

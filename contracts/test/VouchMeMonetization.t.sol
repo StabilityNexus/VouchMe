@@ -169,7 +169,7 @@ contract VouchMeMonetizationTest is Test {
     }
     
     function testSetTreasuryRevertsForZeroAddress() public {
-        vm.expectRevert("Treasury cannot be zero address");
+        vm.expectRevert(VouchMe.TreasuryCannotBeZeroAddress.selector);
         vouchMe.setTreasury(address(0));
     }
     
@@ -191,7 +191,7 @@ contract VouchMeMonetizationTest is Test {
     }
     
     function testSetFeeRevertsWithoutTreasury() public {
-        vm.expectRevert("Set treasury before enabling fees");
+        vm.expectRevert(VouchMe.SetTreasuryBeforeEnablingFees.selector);
         vouchMe.setFee(0.001 ether);
     }
     
@@ -319,7 +319,7 @@ contract VouchMeMonetizationTest is Test {
         bytes memory signature = createValidSignature(bob, alice, CONTENT, GIVER_NAME, PROFILE_URL);
         
         vm.prank(alice);
-        vm.expectRevert("Insufficient fee payment");
+        vm.expectRevert(VouchMe.InsufficientFeePayment.selector);
         vouchMe.createTestimonial{value: 0.005 ether}(bob, CONTENT, GIVER_NAME, PROFILE_URL, signature);
     }
     
@@ -385,7 +385,7 @@ contract VouchMeMonetizationTest is Test {
         bytes memory signature = createValidSignature(bob, alice, CONTENT, GIVER_NAME, PROFILE_URL);
 
         vm.prank(alice);
-        vm.expectRevert("Fee transfer failed");
+        vm.expectRevert(VouchMe.FeeTransferFailed.selector);
         vouchMe.createTestimonial{value: 0.01 ether}(bob, CONTENT, GIVER_NAME, PROFILE_URL, signature);
     }
 
@@ -406,7 +406,7 @@ contract VouchMeMonetizationTest is Test {
             PROFILE_URL
         );
 
-        vm.expectRevert("Refund failed");
+        vm.expectRevert(VouchMe.RefundFailed.selector);
         rejectingReceiver.submitTestimonial{value: 0.02 ether}(
             vouchMe,
             bob,

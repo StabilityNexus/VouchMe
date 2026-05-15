@@ -64,6 +64,19 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
     event FreeThresholdUpdated(uint256 oldThreshold, uint256 newThreshold);
     event FeePaid(address indexed payer, uint256 amount);
     
+    // Custom errors for gas-efficient reverts
+    error InvalidSignature();
+    error TestimonialDoesNotExist();
+    error TestimonialHasBeenDeleted();
+    error TokensAreNonTransferrable();
+    error OnlyRecipientCanDelete();
+    error TestimonialAlreadyDeleted();
+    error InsufficientFeePayment();
+    error FeeTransferFailed();
+    error RefundFailed();
+    error SetTreasuryBeforeEnablingFees();
+    error TreasuryCannotBeZeroAddress();
+    
     constructor() ERC721("VouchMe Testimonial", "VOUCH") Ownable(msg.sender) {
         // Initialize with monetization disabled
         treasury = address(0);
@@ -102,7 +115,7 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
         
         // Verify the signature matches the sender
         address recoveredSigner = ethSignedMessageHash.recover(signature);
-        require(recoveredSigner == senderAddress, "Invalid signature");
+        if (recoveredSigner != senderAddress) revert InvalidSignature();
 
         // Check if there's an existing testimonial from this sender to this receiver
         uint256 existingTokenId = _testimonial[senderAddress][msg.sender];
@@ -117,7 +130,7 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
         uint256 currentCount = _receivedTestimonials[msg.sender].length;
         uint256 requiredFee = _calculateRequiredFee(currentCount);
         if (requiredFee > 0) {
-            require(msg.value >= requiredFee, "Insufficient fee payment");
+            if (msg.value < requiredFee) revert InsufficientFeePayment();
         } else if (msg.value > 0) {
             // No fee is required, so any payment should be refunded later
         }
@@ -165,17 +178,17 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
         // Interactions: transfer fee/refund only after all state changes and events above.
         if (requiredFee > 0) {
             (bool sent, ) = treasury.call{value: requiredFee}("");
-            require(sent, "Fee transfer failed");
+            if (!sent) revert FeeTransferFailed();
             emit FeePaid(msg.sender, requiredFee);
 
             uint256 excess = msg.value - requiredFee;
             if (excess > 0) {
                 (bool refunded, ) = msg.sender.call{value: excess}("");
-                require(refunded, "Refund failed");
+                if (!refunded) revert RefundFailed();
             }
         } else if (msg.value > 0) {
             (bool refunded, ) = msg.sender.call{value: msg.value}("");
-            require(refunded, "Refund failed");
+            if (!refunded) revert RefundFailed();
         }
         
         return newTokenId;
@@ -196,12 +209,12 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
      * @return Testimonial struct containing details
      */
     function getTestimonialDetails(uint256 tokenId) external view returns (Testimonial memory) {
-        require(_ownerOf(tokenId) != address(0), "Testimonial does not exist");
+        if (_ownerOf(tokenId) == address(0)) revert TestimonialDoesNotExist();
         
         // Check if the testimonial exists in the contract state
         address sender = _testimonials[tokenId].sender;
         address receiver = _testimonials[tokenId].receiver;
-        require(_testimonial[sender][receiver] == tokenId, "Testimonial has been deleted");
+        if (_testimonial[sender][receiver] != tokenId) revert TestimonialHasBeenDeleted();
         
         return _testimonials[tokenId];
     }
@@ -258,7 +271,7 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
      * @dev Prevents token transfers by allowing only minting.
      */
     function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
-        require(_ownerOf(tokenId) == address(0), "Tokens are non-transferrable");
+        if (_ownerOf(tokenId) != address(0)) revert TokensAreNonTransferrable();
 
         return super._update(to, tokenId, auth);
     }
@@ -345,11 +358,11 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
      * @param tokenId The token ID to delete
      */
     function deleteTestimonial(uint256 tokenId) external {
-        require(_ownerOf(tokenId) == msg.sender, "Only recipient can delete");
+        if (_ownerOf(tokenId) != msg.sender) revert OnlyRecipientCanDelete();
         
         // Check if the testimonial still exists
         address sender = _testimonials[tokenId].sender;
-        require(_testimonial[sender][msg.sender] == tokenId, "Testimonial already deleted");
+        if (_testimonial[sender][msg.sender] != tokenId) revert TestimonialAlreadyDeleted();
         
         _removeTestimonialFromList(tokenId, sender, msg.sender);
         
@@ -366,7 +379,7 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
      */
     function setFee(uint256 _fee) external onlyOwner {
         // If setting a non-zero fee, treasury must be set first
-        require(_fee == 0 || treasury != address(0), "Set treasury before enabling fees");
+        if (_fee != 0 && treasury == address(0)) revert SetTreasuryBeforeEnablingFees();
         
         uint256 oldFee = fee;
         fee = _fee;
@@ -378,7 +391,7 @@ contract VouchMe is ERC721URIStorage, Ownable, ReentrancyGuard {
      * @param _treasury The treasury address
      */
     function setTreasury(address _treasury) external onlyOwner {
-        require(_treasury != address(0), "Treasury cannot be zero address");
+        if (_treasury == address(0)) revert TreasuryCannotBeZeroAddress();
         
         address oldTreasury = treasury;
         treasury = _treasury;
